@@ -1,0 +1,573 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   DAIMA CIVIL ENGINEERING WORKS — VISUAL SYSTEM
+   --------------------------------------------------------------------------
+   The reference is not a construction website. It is a drawing sheet: a
+   ruled field, a title block, plate numbers, dimension lines, and material
+   colour taken from the site itself — graphite, concrete, steel, off-white
+   paper, and a single warm copper used only where an action or a reading
+   matters. Everything is aligned to a 12-column field with visible hairlines,
+   because an engineering firm's site should look measured, not decorated.
+   ========================================================================== */
+
+@theme {
+  /* --- Ground: graphite through concrete to paper ----------------------- */
+  --color-graphite-950: #0a0c0e;
+  --color-graphite-900: #101316;
+  --color-graphite-800: #16191d;
+  --color-graphite-700: #1d2126;
+  --color-steel-600: #272c32;
+  --color-steel-500: #363c43;
+  --color-steel-400: #4a5159;
+  --color-concrete-400: #6d747c;
+  --color-concrete-300: #9aa0a7;
+  --color-concrete-200: #c4c6c4;
+  --color-concrete-100: #dedcd6;
+  --color-paper-100: #eae8e3;
+  --color-paper-50: #f4f2ee;
+
+  /* --- Ink --------------------------------------------------------------- */
+  --color-ink: #13161a;          /* 16.4:1 on paper-50 */
+  --color-ink-2: #454b52;        /*  8.4:1 on paper-50 */
+  --color-ink-3: #6b7278;        /*  4.9:1 on paper-50 */
+  --color-on-dark: #e7e5e0;      /* 15.1:1 on graphite-900 */
+  --color-on-dark-2: #a2a8ad;    /*  7.5:1 on graphite-900 */
+  --color-on-dark-3: #767d84;    /*  4.5:1 on graphite-900 */
+
+  /* --- Copper: actions, readings, marks. Never decoration. -------------- */
+  --color-copper: #c4652c;       /* fills; white text on it reads 5.1:1 */
+  --color-copper-light: #e08a4b; /* copper-family TEXT on graphite — 6.8:1 */
+  --color-copper-ink: #8f4718;   /* copper-family TEXT on paper — 6.1:1 */
+  --color-copper-dim: #7a3f1c;
+
+  --font-display: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+:root {
+  --gutter: clamp(1.25rem, 4.2vw, 4rem);
+  --measure: 1560px;
+  --rule-dark: rgba(231, 229, 224, 0.13);
+  --rule-dark-strong: rgba(231, 229, 224, 0.26);
+  --rule-light: rgba(19, 22, 26, 0.13);
+  --rule-light-strong: rgba(19, 22, 26, 0.28);
+  --header-h: 5.25rem;
+  color-scheme: dark;
+}
+
+@media (max-width: 900px) {
+  :root { --header-h: 4.25rem; }
+}
+
+/* --------------------------------------------------------------------------
+   Everything below lives in @layer components.
+   Unlayered CSS outranks every cascade layer, so leaving these rules outside
+   one would let `.btn`, `.plate` and friends silently beat Tailwind utilities
+   — `hidden sm:inline-flex` on a `.btn` is the case that caught this. Inside
+   the components layer, utilities always win, which is what a utility class
+   is for. `!important` in a lower layer still wins, which is exactly what the
+   reduced-motion block needs.
+   -------------------------------------------------------------------------- */
+
+@layer components {
+
+  /* ==========================================================================
+     BASE
+     ========================================================================== */
+
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-graphite-900);
+    color: var(--color-on-dark);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5 { margin: 0; font-weight: 500; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  img, svg, video { display: block; max-width: 100%; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+
+  ::selection {
+    background: var(--color-copper);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-copper-light);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  /* ==========================================================================
+     TYPE RAMP
+     Archivo, narrowed slightly for display. Tight tracking, short leading —
+     the proportions of a drawing-sheet title block rather than a magazine.
+     ========================================================================== */
+
+  .t-display {
+    font-size: clamp(2.6rem, 7.1vw, 6.25rem);
+    line-height: 0.92;
+    letter-spacing: -0.032em;
+    font-weight: 500;
+    font-stretch: 92%;
+    text-wrap: balance;
+  }
+
+  .t-h1 {
+    font-size: clamp(2.25rem, 5.4vw, 4.5rem);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+    font-stretch: 94%;
+    text-wrap: balance;
+  }
+
+  .t-h2 {
+    font-size: clamp(1.875rem, 3.9vw, 3.125rem);
+    line-height: 1.02;
+    letter-spacing: -0.026em;
+    font-weight: 500;
+    font-stretch: 96%;
+    text-wrap: balance;
+  }
+
+  .t-h3 {
+    font-size: clamp(1.375rem, 2.3vw, 1.875rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  .t-h4 {
+    font-size: clamp(1.125rem, 1.5vw, 1.3125rem);
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+  }
+
+  .t-lede {
+    font-size: clamp(1.0625rem, 1.35vw, 1.3125rem);
+    line-height: 1.55;
+    letter-spacing: -0.011em;
+    font-weight: 400;
+    text-wrap: pretty;
+  }
+
+  .t-body {
+    font-size: clamp(0.9688rem, 1.02vw, 1.0625rem);
+    line-height: 1.68;
+    letter-spacing: -0.004em;
+    text-wrap: pretty;
+  }
+
+  /* The technical voice: every label, index, dimension and reading. */
+  .t-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .t-label-sm {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .t-num {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* ==========================================================================
+     LAYOUT FIELD
+     ========================================================================== */
+
+  .shell {
+    width: 100%;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* A band is a full-width horizontal stratum, seamed to the next by a rule. */
+  .band {
+    position: relative;
+    padding-block: clamp(4.5rem, 9vw, 9rem);
+  }
+
+  .band--tight { padding-block: clamp(3rem, 5.5vw, 5rem); }
+
+  .band-seam { border-top: 1px solid var(--rule-dark); }
+  .band-seam--light { border-top: 1px solid var(--rule-light); }
+
+  /* Ground tones */
+  .on-graphite { background: var(--color-graphite-900); color: var(--color-on-dark); }
+  .on-graphite-800 { background: var(--color-graphite-800); color: var(--color-on-dark); }
+  .on-steel { background: var(--color-steel-600); color: var(--color-on-dark); }
+  .on-paper { background: var(--color-paper-50); color: var(--color-ink); }
+  .on-paper-100 { background: var(--color-paper-100); color: var(--color-ink); }
+
+  /* --- The ruled field --------------------------------------------------
+     Vertical hairlines at the twelve-column positions, drawn behind content.
+     This is the single device that makes the whole site read as engineered. */
+  .field {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .field::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--rule-dark) 0 1px,
+      transparent 1px calc(100% / 6)
+    );
+    background-clip: content-box;
+    background-origin: content-box;
+    background-repeat: repeat-x;
+    opacity: 0.85;
+  }
+
+  .field--light::before { background-image: repeating-linear-gradient(to right, var(--rule-light) 0 1px, transparent 1px calc(100% / 6)); }
+
+  @media (max-width: 760px) {
+    .field::before { background-size: 50% 100%; }
+  }
+
+  /* --- Blueprint grid, used sparingly on dark bands --------------------- */
+  .blueprint {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;       /* contains the drifting layer — no page-level overflow */
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 78%);
+  }
+
+  .blueprint::before {
+    content: "";
+    position: absolute;
+    inset: -12%;
+    background-image:
+      linear-gradient(to right, var(--rule-dark) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--rule-dark) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.55;
+    animation: drift 90s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes drift {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-80px, -80px, 0); }
+  }
+
+  /* --- Corner tick: the crosshair at a grid intersection ---------------- */
+  .tick {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+  .tick::before,
+  .tick::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+  }
+  .tick::before { left: 0; top: 4px; width: 9px; height: 1px; }
+  .tick::after { top: 0; left: 4px; width: 1px; height: 9px; }
+
+  /* ==========================================================================
+     SECTION HEADS
+     ========================================================================== */
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .eyebrow-rule {
+    flex: 1;
+    height: 1px;
+    opacity: 0.22;
+  }
+
+  /* ==========================================================================
+     CONTROLS
+     ========================================================================== */
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1.0625rem 1.625rem;
+    border: 1px solid transparent;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.35s var(--ease-out-quart),
+                border-color 0.35s var(--ease-out-quart),
+                background-color 0.35s var(--ease-out-quart);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* The restrained micro-interaction: a fill wipes up from the baseline. */
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    transform: scaleY(0);
+    transform-origin: bottom center;
+    transition: transform 0.42s var(--ease-out-expo);
+  }
+
+  .btn:hover::before,
+  .btn:focus-visible::before { transform: scaleY(1); }
+
+  .btn__arrow {
+    display: inline-block;
+    transition: transform 0.42s var(--ease-out-expo);
+  }
+  .btn:hover .btn__arrow { transform: translateX(4px); }
+
+  .btn--primary {
+    background: var(--color-copper);
+    color: #fff;
+    border-color: var(--color-copper);
+  }
+  .btn--primary::before { background: #fff; }
+  .btn--primary:hover,
+  .btn--primary:focus-visible { color: var(--color-copper-ink); }
+
+  .btn--ghost-dark {
+    color: var(--color-on-dark);
+    border-color: var(--rule-dark-strong);
+  }
+  .btn--ghost-dark::before { background: var(--color-on-dark); }
+  .btn--ghost-dark:hover,
+  .btn--ghost-dark:focus-visible { color: var(--color-graphite-900); border-color: var(--color-on-dark); }
+
+  .btn--ghost-light {
+    color: var(--color-ink);
+    border-color: var(--rule-light-strong);
+  }
+  .btn--ghost-light::before { background: var(--color-ink); }
+  .btn--ghost-light:hover,
+  .btn--ghost-light:focus-visible { color: var(--color-paper-50); border-color: var(--color-ink); }
+
+  .btn--sm { padding: 0.75rem 1.125rem; font-size: 0.625rem; }
+
+  /* Text action with a rule that extends on hover — used inside cards. */
+  .action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-bottom: 0.5rem;
+    position: relative;
+  }
+
+  .action::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    opacity: 0.3;
+    transform: scaleX(0.32);
+    transform-origin: left center;
+    transition: transform 0.5s var(--ease-out-expo), opacity 0.4s;
+  }
+
+  .action:hover::after,
+  a:hover .action::after,
+  .group:hover .action::after { transform: scaleX(1); opacity: 1; }
+
+  .action__arrow { transition: transform 0.45s var(--ease-out-expo); }
+  .action:hover .action__arrow,
+  a:hover .action .action__arrow,
+  .group:hover .action .action__arrow { transform: translateX(5px); }
+
+  /* ==========================================================================
+     PLATES (images)
+     ========================================================================== */
+
+  .plate {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-steel-600);
+  }
+
+  .plate img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Stock photography arrives in a dozen different colour temperatures.
+       Pulling the saturation back a little lets the whole page read as one
+       set of site records; hover returns the photograph to full colour. */
+    filter: saturate(0.84) contrast(1.04);
+    transition: transform 1.1s var(--ease-out-expo), filter 0.7s var(--ease-out-quart);
+  }
+
+  .plate--zoom:hover img,
+  .group:hover .plate--zoom img { transform: scale(1.045); }
+
+  .plate--zoom:hover img,
+  .group:hover .plate--zoom img,
+  a:hover .plate img { filter: saturate(1) contrast(1.02); }
+
+  /* ==========================================================================
+     REVEAL — the only scroll motion on the site.
+     Images uncover from the baseline; text and rules follow.
+     ========================================================================== */
+
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity 0.85s var(--ease-out-quart) var(--reveal-delay, 0ms),
+      transform 0.95s var(--ease-out-expo) var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  /* The clip lives on an inner mask, never on the observed element: an
+     element clipped to zero height reports a zero intersection ratio, and
+     would never trigger its own observer. */
+  .js [data-reveal="plate"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js [data-reveal="plate"] .plate-mask {
+    overflow: hidden;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path 1.15s var(--ease-out-expo) var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal="plate"] .plate-mask > * {
+    transform: scale(1.06);
+    transition: transform 1.6s var(--ease-out-expo) var(--reveal-delay, 0ms);
+  }
+
+  /* Same trap as the plate clip: an element scaled to zero width reports a
+     zero intersection ratio, so the line is drawn on an inner span while the
+     observed wrapper keeps its real box. */
+  .js [data-reveal="rule"] { opacity: 1; }
+
+  .js [data-reveal="rule"] > * {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1s var(--ease-out-expo) var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .js [data-reveal="plate"].is-in .plate-mask { clip-path: inset(0 0 0 0); }
+  .js [data-reveal="plate"].is-in .plate-mask > * { transform: scale(1); }
+  .js [data-reveal="rule"].is-in > * { transform: scaleX(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal],
+    [data-reveal="plate"],
+    [data-reveal="rule"],
+    [data-reveal="plate"] .plate-mask,
+    [data-reveal="plate"] .plate-mask > *,
+    [data-reveal="rule"] > * {
+      opacity: 1 !important;
+      transform: none !important;
+      clip-path: none !important;
+      transition: none !important;
+    }
+    .blueprint::before { animation: none; }
+    .plate img { transition: none; }
+  }
+
+  /* ==========================================================================
+     MISC
+     ========================================================================== */
+
+  .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* A slot that has not been filled in yet. Reads as a drawing convention,
+     not as a bug — and it is impossible to mistake for a real figure. */
+  .slot {
+    display: inline-block;
+    min-width: 3.5rem;
+    border-bottom: 1px dashed currentColor;
+    opacity: 0.42;
+    vertical-align: baseline;
+  }
+
+  .rule-h { height: 1px; background: currentColor; opacity: 0.16; }
+
+  /* Mobile action bar clearance */
+  @media (max-width: 860px) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    .has-actionbar { padding-bottom: 4.25rem; }
+  }
+
+}
